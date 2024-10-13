@@ -20,17 +20,6 @@ def parse_name(ckpt_name):
     return filename
 
 
-def calculate_sha256(file_path):
-    sha256_hash = hashlib.sha256()
-
-    with open(file_path, "rb") as f:
-        # Read the file in chunks to avoid loading the entire file into memory
-        for byte_block in iter(lambda: f.read(4096), b""):
-            sha256_hash.update(byte_block)
-
-    return sha256_hash.hexdigest()
-
-
 def handle_whitespace(string: str):
     return string.strip().replace("\n", " ").replace("\r", " ").replace("\t", " ")
 
@@ -213,10 +202,8 @@ class ImageSaveWithMetadata:
                    lossless_webp, width, height, counter, filename, path, extension, time_format, prompt=None, extra_pnginfo=None):
         filename = make_filename(filename, seed_value, modelname, counter, time_format)
         path = make_pathname(path, seed_value, modelname, counter, time_format)
-        ckpt_path = folder_paths.get_full_path("checkpoints", modelname)
         basemodelname = parse_name(modelname)
-        modelhash = calculate_sha256(ckpt_path)[:10]
-        comment = f"{handle_whitespace(positive)}\nNegative prompt: {handle_whitespace(negative)}\nSteps: {steps}, Sampler: {sampler_name}{f'_{scheduler}' if scheduler != 'normal' else ''}, CFG Scale: {cfg}, Seed: {seed_value}, Size: {width}x{height}, Model hash: {modelhash}, Model: {basemodelname}, Version: ComfyUI"
+        comment = f"{handle_whitespace(positive)}\nNegative prompt: {handle_whitespace(negative)}\nSteps: {steps}, Sampler: {sampler_name}{f'_{scheduler}' if scheduler != 'normal' else ''}, CFG Scale: {cfg}, Seed: {seed_value}, Size: {width}x{height}, Model: {basemodelname}, Version: ComfyUI"
         output_path = os.path.join(self.output_dir, path)
 
         if output_path.strip() != '':
